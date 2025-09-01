@@ -1,0 +1,148 @@
+---------Tüm ürünleri listele. (Tüm kolonlar)----------
+--1
+SELECT * FROM products;
+
+---------Sadece product_id ve product_name kolonlarını listele.----------
+--2
+SELECT product_id, product_name FROM products;
+
+---------Fiyatı 20’den büyük ürünleri listele.----------
+--3
+SELECT * FROM products
+WHERE unit_price > 20;
+
+---------Stok değeri 0 olan (tükendi) ürünleri listele.----------
+--4
+SELECT * FROM products
+WHERE stock = 0;
+
+---------Fiyatı 10–20 arası (her iki sınır dahil) ürünleri listele----------
+--5
+SELECT * FROM products
+WHERE unit_price BETWEEN 10 AND 20;
+
+---------Fiyatı 15’ten büyük VE stok değeri 30’dan küçük ürünleri listele.--------
+--6
+SELECT * FROM products
+WHERE unit_price > 15 AND stock < 30;
+
+---------Fiyatı 50’den büyük YA DA stok değeri 5’ten küçük ürünleri listele.----------
+--7
+SELECT * FROM products
+WHERE unit_price > 50 OR stock < 5;
+
+---------Ürünleri product_name’e göre A→Z sırala.----------
+--8
+SELECT * FROM products
+ORDER BY product_name ASC;
+
+---------Ürünleri unit_price’a göre Z→A sırala.----------
+--9
+SELECT * FROM products
+ORDER BY unit_price DESC;
+
+---------Stoku 10’dan fazla olan en ucuz 10 ürünü listele (fiyata göre artan + LIMIT 10).---------
+--10
+SELECT * FROM products
+WHERE stock > 10
+ORDER BY unit_price ASC
+LIMIT 10;
+
+---------Adı ‘Ch’ ile başlayan ürünleri listele (LIKE, ‘Ch%’).----------
+--11
+SELECT * FROM products
+WHERE product_name LIKE 'Ch%';
+
+---------Adı ‘a’ harfiyle biten ürünleri listele (LIKE, ‘%a’).----------
+--12
+SELECT * FROM products
+WHERE product_name LIKE '%a';
+
+---------Adında ‘g’ geçen ürünleri listele (LIKE, ‘%g%’).----------
+--13
+SELECT * FROM products
+WHERE product_name LIKE '%g%';
+
+-----Tam uzunluğu 5 harf olan ve ‘C’ ile başlayan ürünleri listele (LIKE, ‘C____’).----
+--14
+SELECT * FROM products
+WHERE product_name LIKE 'C____';
+
+---- Kategori adıyla birlikte ürünleri listele: product_id, product_name, category_id, category_name (INNER JOIN).----
+--15
+SELECT p.product_id, p.product_name, c.category_id, c.category_name
+FROM products p
+INNER JOIN categories c ON p.category_id = c.category_id;
+
+----Sadece Beverages kategorisindeki ürünleri, product_name ve unit_price ile listele (JOIN + WHERE).----
+--16
+SELECT p.product_name, p.unit_price
+FROM products p
+INNER JOIN categories c ON p.category_id = c.category_id
+WHERE c.category_name = 'Beverages';
+
+----Kategori adı ‘S’ ile başlayan kategorilerdeki en pahalı 5 ürünü listele (JOIN + WHERE + ORDER BY price DESC + LIMIT 5).----
+--17
+SELECT p.product_name, p.unit_price, c.category_name
+FROM products p
+INNER JOIN categories c ON p.category_id = c.category_id
+WHERE c.category_name LIKE 'S%'
+ORDER BY p.unit_price DESC
+LIMIT 5;
+
+----Çalışan adı-soyadı ve verdiği siparişin order_id ile order_date değerlerini birlikte listele (orders ↔ employees JOIN).----
+--18
+SELECT e.first_name, e.last_name, o.order_id, o.order_date
+FROM orders o
+INNER JOIN employees e ON o.employee_id = e.employee_id;
+
+----1997 yılında verilen siparişleri, ilgili employee first_name, last_name ile birlikte listele.----
+--19
+SELECT o.order_id, o.order_date, e.first_name, e.last_name
+FROM orders o
+INNER JOIN employees e ON o.employee_id = e.employee_id
+WHERE o.order_date BETWEEN '1997-01-01' AND '1997-12-31';
+
+----Soyadı ‘n’ ile biten çalışanların verdiği siparişleri (order_id, order_date) listele (JOIN + LIKE ‘%n’).----
+--20
+SELECT o.order_id, o.order_date, e.last_name
+FROM orders o
+INNER JOIN employees e ON o.employee_id = e.employee_id
+WHERE e.last_name LIKE '%n';
+
+----Ürün adı ‘a’ içeren ve stok değeri 20’den büyük ürünleri fiyata göre artan sırada listele.----
+--21
+SELECT * FROM products
+WHERE product_name LIKE '%a%' AND stock > 20
+ORDER BY unit_price ASC;
+
+----Kategori adı ‘Confections’ olan ürünlerden adı ‘Ch’ ile başlayanları, fiyata göre azalan sırada listele.----
+--22
+SELECT p.product_name, p.unit_price
+FROM products p
+INNER JOIN categories c ON p.category_id = c.category_id
+WHERE c.category_name = 'Confections' AND p.product_name LIKE 'Ch%'
+ORDER BY p.unit_price DESC;
+
+----Stoku 0 olmayan ürünleri kategori adıyla birlikte getir; çıktıda sadece product_name, category_name, units_in_stock olsun ve kategori adına göre A→Z sırala.----
+--23
+SELECT p.product_name, c.category_name, p.stock
+FROM products p
+INNER JOIN categories c ON p.category_id = c.category_id
+WHERE p.stock > 0
+ORDER BY c.category_name ASC;
+
+----Fiyatı 25’ten küçük ürünler için (ÜrünAdı – Fiyat) formatında iki kolonu yan yana getir.----
+--24
+SELECT CONCAT(p.product_name, ' - ', p.unit_price) AS product_price
+FROM products p
+WHERE p.unit_price < 25;
+
+----Çalışan adı ‘Andrew’ olan kişinin 1998’de verdiği siparişlerin order_id ve order_date’lerini tarihe göre eski→yeni sırada listele.----
+--25
+SELECT o.order_id, o.order_date
+FROM orders o
+INNER JOIN employees e ON o.employee_id = e.employee_id
+WHERE e.first_name = 'Andrew'
+  AND o.order_date BETWEEN '1998-01-01' AND '1998-12-31'
+ORDER BY o.order_date ASC;
